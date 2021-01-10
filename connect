@@ -1,0 +1,11 @@
+# Подключение ssh к серверу
+
+chmod 600 ~/Downloads/qwikLABS-XXXXX.pem - 
+ssh -i ~/Downloads/qwikLABS-XXXXX.pem username@External Ip Address
+
+# Листинг запущеных служб
+
+sudo systemctl --state=running # работающие службы
+sudo systemctl --state=failed # службы с ошибкой(в состоянии сбоя)
+sudo service rsyslog stop # Остановить службу(в данном случае rsyslog) start - запустить, status - статус, restart - перезапустить, reload - перезагрузка(без выполнения остановки и запуска, перечитает свой конф файл)
+
