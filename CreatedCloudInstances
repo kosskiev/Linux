@@ -1,0 +1,33 @@
+# Создание облачных экземпляров
+
+# Нужно создать ряд параметров: 
+# 1) Имя - индификатор экземпляра(linux-instance), 
+# 2) регион и зона - в каком месте поднимать центр обработки данных(us-central1 - регион по умолчанию, us-central1-f - последняя f это зона, в одном центре может быть несколько зон)
+# 3) Тип машины - это выбор количества процессоров и памяти
+# 4) Загрузочный диск - вибор операционки (Ubuntu 16.04 LTS) и места на диске (10ГБ)
+# 5) Брандмауэр - позволяет выбрать определенный входящий трафик, открытие портов
+# Команда cjplftn c 1 по 4 пункты 
+gcloud compute instances create linux-instance --zone=us-central1-f --machine-type=n1-standard-1 --subnet=default  --tags=http-server --image=ubuntu-1604-xenial-v20190628 --image-project=ubuntu-os-cloud --boot-disk-size=10GB
+# Команда создает правила Брандмаузера(5 пункт)
+gcloud compute firewall-rules create default-allow-http --direction=INGRESS --priority=1000 --network=default --action=ALLOW --rules=tcp:80 --source-ranges=0.0.0.0/0 --target-tags=http-server
+
+# Создаем виндовс зкземпляр 
+gcloud compute instances create windows-instance --zone=us-central1-f --machine-type=n1-standard-1 --subnet=default --image=windows-server-2016-dc-v20190709 --image-project=windows-cloud --boot-disk-size=50GB
+
+# Посмотреть все экземпляры
+gcloud compute instances list  -отображает название. и IP
+
+# подключаемся к Linux - серверу
+gcloud compute ssh linux-instance --zone us-central1-f
+
+# ставим NGINX на сервер
+sudo apt update
+sudo apt install nginx
+
+# Проверяем по IP тестовую страницу NGINX
+
+# Создание дополнительного диска для хранения данных 
+gcloud compute disks create additional-disk --type=pd-standard --size=500GB --zone=us-central1-f
+
+# присоединение диска к экземпляру
+ gcloud compute instances attach-disk windows-instance --disk additional-disk - в данном случае к windows экземпляру
