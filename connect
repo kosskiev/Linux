@@ -9,3 +9,11 @@ sudo systemctl --state=running # работающие службы
 sudo systemctl --state=failed # службы с ошибкой(в состоянии сбоя)
 sudo service rsyslog stop # Остановить службу(в данном случае rsyslog) start - запустить, status - статус, restart - перезапустить, reload - перезагрузка(без выполнения остановки и запуска, перечитает свой конф файл)
 
+# Операции с пользователями 
+who - Кто в системе
+last - последние входы в систему
+groupadd admin - группа администратор
+useradd -c 'Koss' -g admin -m koss - создает пользователя koss и добавляет в группу admin
+userdell koss - удалить пользователя
+adduser koss - добавляет пользователя koss
+usermod - меняем инфу по пользователю
