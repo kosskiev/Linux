@@ -1,0 +1,32 @@
+# установка apache2
+
+sudo apt update
+sudo apt install apache2. 
+# можно проверять по нашему ip отображение сайта(отобразится страница Apache)
+
+# проверка списка доступных сайтов 
+ls -l /etc/apache2/sites-available
+
+# проверка корнфигурационного файла
+cat /etc/apache2/sites-available/000-default.conf
+
+# перемещаем наш сайт с нашего каталога в нужный каталог
+sudo mv /opt/devel/ourcompany /var/www/ourcompany
+
+# Создание нового доступного сайта
+# делаем копию сайта по умолчанию, а затем отредактируем новый файл.
+cd /etc/apache2/sites-available. # переходим в папку сайта
+sudo cp 000-default.conf 001-ourcompany.conf # копируем файл
+sudo nano 001-ourcompany.conf # редактируем файл под себя
+# мы собираемся изменить каталог, в котором хранятся файлы. Вместо /var/www/html мы поместим наш сайт в /var/www/ourcompany 
+# наш сайт еще не включен, сайт информационный  Apache2 сейчас стоит
+# ls -l /etc/apache2/sites-enabled - тут показывается что этот файл лиш симыолическая ссылка на другой
+
+sudo a2ensite 001-ourcompany.conf # включаем новый сайт
+sudo a2dissite 000-default.conf # отключаем старый сайт
+
+# осталось только перегррузить сервис
+sudo service apache2 reload
+
+# Дополнительный конфигурации читать в документации к Apache2 
+
