@@ -1,7 +1,7 @@
 # установка apache2
 
 sudo apt update
-sudo apt install apache2. 
+sudo apt install apache2 
 # можно проверять по нашему ip отображение сайта(отобразится страница Apache)
 
 # проверка списка доступных сайтов 
