@@ -1,0 +1,27 @@
+# информация по Jenkins 
+# Ставлю на Ubuntu
+# Сначала проверить Java - если нет то установить
+
+java -version - узнать версию
+sudo apt-get update - обновить репозитории перед любой установкой
+sudo apt-get install openjdk-8-jre - версию java которую я поставил(можно выбрать другую)
+
+# теперь ставим Jenkins по одной команде(4 команды)
+wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -
+sudo sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > \
+    /etc/apt/sources.list.d/jenkins.list'
+sudo apt-get update
+sudo apt-get install jenkins
+
+# проверяем запущен ли он
+sudo servive jenkins status - статус 
+
+# можем проверить web интерфейс он на порту :8080
+ip-адрес:8080
+
+# сделать разблокировку(один раз) он покажет адрес файла
+sudo cat - и ввести адрес файла
+
+# далее установка с плагинами или без
+
+
