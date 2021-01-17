@@ -6,7 +6,7 @@ java -version - узнать версию
 sudo apt-get update - обновить репозитории перед любой установкой
 sudo apt-get install openjdk-8-jre - версию java которую я поставил(можно выбрать другую)
 
-# теперь ставим Jenkins по одной команде(4 команды)
+# теперь ставим Jenkins по одной команде(4 команды) если нужно поставить другую версию информация ниже
 wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -
 sudo sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > \
     /etc/apt/sources.list.d/jenkins.list'
@@ -23,5 +23,21 @@ ip-адрес:8080
 sudo cat - и ввести адрес файла
 
 # далее установка с плагинами или без
+
+# УСНАТОВКА другой версии Jenkins
+cd /usr/share/jenkins/ - место файла старого если установленна(в эту директорию мы вставим нужную нам версию)
+wget ссылка на нужный файл (http://updates.jenkins-ci.org/download/war/ - можно выбрать нужный файл)
+ 
+sudo service jenkins restsrt - перезапустить службу и все готово
+
+# Плагины от Jenkins размещены по этому адресу
+cd /var/lib/jenkins/plugins
+
+# мои item(задачи) сохраняются в этой папке
+cd /var/lib/jenkins/jobs
+
+# мои билды сохраняются в каждой item(пример адресса)
+cd /var/lib/jenkins/jobs/JenkinsJobN-1/builds (если не настроить количество последних они займут все место)
+ 
 
 
