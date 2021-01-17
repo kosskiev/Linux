@@ -38,6 +38,29 @@ cd /var/lib/jenkins/jobs
 
 # мои билды сохраняются в каждой item(пример адресса)
 cd /var/lib/jenkins/jobs/JenkinsJobN-1/builds (если не настроить количество последних они займут все место)
- 
 
+# УПРАВЛЕНИЕ из командной стороки Jenkins-CLI. - Это управление с сервера можно настроить управление со своего компьютера инфа ниже
+# скачиваем на свой сервер
+wget http://13.49.225.111:8080/jnlpJars/jenkins-cli.jar(ip будет другой)
 
+# запустить команду (перед эти сделать пользователя и пароль/ или токен(его можно создать только переавторизовавшись под этим пользователем))
+# токен выглядит вот так 118528c578b76c478abcfcd51afd8e2f1d
+java -jar jenkins-cli.jar -auth username:password -s http://localhost:8080 who-am-i (вместо username/login, password/token)
+
+# лучше не вводить логин и токен в таком виде лучше использовать переменные среды
+export JENKINS_USER_ID=user_cli
+export JENKINS_API_TOKEN=118528c578b76c478abcfcd51afd8e2f1d
+# просмотреть переменные
+env | grep JENKINS
+# после этого можно уменьшить команду и она будет выглядить так
+java -jar jenkins-cli.jar -s http://localhost:8080 who-am-i
+
+# УПРАВЛЕНИЕ со своего компьютера Windows
+# сначала скачиваем клиент Jenkins-CLI (нужно зайти 1 раз на сервер)
+@env:JENKINS_USER_ID="user_cli"
+@env:JENKINS_API_TOKEN="118528c578b76c478abcfcd51afd8e2f1d"
+
+# ввод команды
+java -jar ./jenkins-cli.jar -s http://13.49.225.111:8080 who-am-i -после порта вводятся команды(перечеть есть в Jenkins на сайте) 
+
+# GITHUB - возьмем код отсюда
