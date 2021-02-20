@@ -2,7 +2,7 @@
 
 sudo apt update
 sudo apt install apache2 
-# после этого он не отображается выдает ошибку apache err_connection_refused
+# после этого он отображается на http не https
 # можно проверять по нашему ip отображение сайта(отобразится страница Apache)
 
 # проверка списка доступных сайтов 
