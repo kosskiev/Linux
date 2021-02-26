@@ -1,0 +1,30 @@
+# Первое занкомство с Pulumi
+# Поставлю на Ubuntu 20.04 сервер 
+sudo apt update
+sudo curl -fsSL https://get.pulumi.com | sh
+
+# требуется перезагрузка сервера Reboot instance
+# проверим версию (на данный момент v2.21.2)
+pulumi version
+
+# Зайти в свой профиль Pulumi и сгенерировать Access Tokens (примерно так будет pul-0122da5d78a559de46a55351107fad4d701466c3)
+# Теперь подключаемся к своей учетке 
+pulumi login
+# Он попросит нас ввести этот код или нажать Enter  и перейти по ссылке которую он выдаст
+# после этого выдаст  Welcome to Pulumi!
+
+# поставим сразу Python
+sudo apt-get install python3.8
+
+# поставим AWS CLI
+sudo apt  install awscli
+# занесем сразу Access Key и Privet Key (будет 4 вопроса)
+aws configure
+
+# теперь можно создавать чере GUI интерфейс (в своем аккаунте https://app.pulumi.com/site/) или в терминале
+
+# Делаю в терминале
+pulumi up
+
+# замочить
+pulumi destroy
