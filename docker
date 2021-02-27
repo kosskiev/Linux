@@ -1,0 +1,62 @@
+# Поставим Docker и запустим различные команды
+# Поднимаем нужный нам сервер(в данном примере ubuntu 20.04) и ставим нужное по
+sudo apt update
+sudo apt install -y apt-transport-https software-properties-common ca-certificates curl wget
+wget https://download.docker.com/linux/ubuntu/gpg 
+sudo apt-key add gpg
+echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable" | sudo tee /etc/apt/sources.list.d/docker.list
+sudo apt update
+sudo apt install -y docker-ce
+sudo systemctl start docker
+sudo systemctl enable docker
+sudo systemctl status docker
+
+# Докер бежит можем проверить версию
+docker --version
+
+# просмотр всез используемых/запущеных докеров (ps -a показать когда либо запущеных докеров)
+sudo docker ps
+
+# Добавлю нас в группу админов чтобы выполнять команды докера без sudo
+sudo usermod -aG docker $USER  (после этого нужно перезайти на сервер )
+
+# просмотр установленых docker образов(images)
+docker images
+
+# поиск images можно на сайте (https://hub.docker.com/) а можно в строке
+docker search tomcat
+
+# скачать нужный образ (tomcat в данном случае)
+docker pull tomcat 
+
+# запускаю контейнер (-it означает интерактивно) (-p перенаправление портов, первый порт на который мы хотим получить наш сервер, второй порт на котором он запускается в самом контейнере)
+docker run -it -p 1234:8080 tomcat 
+docker run -d -p 1234:8080 tomcat (будет бежать в фоне -d демон)
+(tomcat выдаст ошибку 404 это норма нуно настроить показ)
+
+# удалить выключенный докер (нужен его ID или назавние)
+docker rm d6a197fc6bed
+# удальть docker images только если оо преред эти удален из docker ps -a
+docker rmi d6a197fc6bed
+
+# Создаем свой docker (сначала сделаем директорию и перейдем в нее)
+mkdir mydocker
+cd mydocker
+nano Dockerfile (создаем Dockerfile название точно такое должно быть и без расширения)
+# в данный файл вставляем нужный нам код(пример ниже) и сохраняем его
+#FROM ubuntu:16.04
+#RUN apt-get -y update
+#RUN apt-get -y install apache2
+#RUN echo 'Hello World from Docker!' > /var/www/html/index.html
+#CMD ["/usr/sbin/apache2ctl", "-D","FOREGROUND"]
+#EXPOSE 80
+
+# Делаем image из нашего файла (koss - название image, v1 - это таг, . - это в текущей директории, он сейчас найдет докер файл)
+docker build -t koss:v1 .
+
+# теперь можем запустить
+docker run -d -p 1235:80 koss:v1
+
+# зайти на контейнер (8dfg7bc655vmn9sd - это контейнер id) и работать как на сервере только он обрезан, многие проги не запустятся
+docker exec -it 8dfg7bc655vmn9sd /bin/bash
+
