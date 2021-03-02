@@ -1,4 +1,8 @@
 # напишу несколько видов playbook 
+
+# посмотреть все доступные переменные которые можем использовать
+ansible all -m setup 
+____________________________________________________________________
 # первый просто проверит доступность соединения 
 nano playbook.yml
 --- (обязательное начало файла)
@@ -10,8 +14,9 @@ nano playbook.yml
 
   - name: Ping my servers
     ping:
-
-# поставим веб сервер
+# запустить ansible-playbook playbook.yml 
+____________________________________________________________________
+# второй поставим веб сервер
 nano playbook1.yml
 
 ---
@@ -26,8 +31,10 @@ nano playbook1.yml
 
   - name: Statrt Apache2 and Enable to boot  
     service: name=apache2 state=started enabled=yes   (название, стартовать, запуск при старте сервиса)
- 
-# Установка веб сервера, копирование нашего сайта и настройка перезапуска если нужно
+
+# запустить ansible-playbook playbook1.yml 
+______________________________________________________________________
+# третий Установка веб сервера, копирование нашего сайта и настройка перезапуска если нужно
 
 ---
 - name  : Install apache and upload my website 
@@ -54,4 +61,36 @@ nano playbook1.yml
   handlers :
    - name: Restart Apache  
      service: name=apache2 state=restarted   (перезагрузка сервера)
+____________________________________________________________________
+# четвертый вывод различных сообщений на серверах
+---
+- name: Playbook for variables
+  hosts: all
+  become: yes
 
+  vars:
+    message1: Some text
+    message2: Some text
+    secret  : hgfjwhihjghgv12gvg
+
+  tasks:
+
+  - name: writed some texts on our servers
+    debug:
+      var: secret
+
+  - debug:
+      msg: "Secret: {{ secret }}"
+
+  - set_fact: full_message="{{ message1 }} {{ message2 }}" (создал переменную full_message)
+  
+  - debug: 
+      var: full_message  (теперь напечатается эта переменная)
+  - debug:
+      vag: ansible_distribution
+  - shell: uptime   (покажет время на сервере но не выведет)
+    register: results  (время сохраним в переменную results)
+  - debug: 
+      var: results  (напечатаем результаты )
+      
+____________________________________________________________________
