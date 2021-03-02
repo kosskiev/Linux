@@ -1,4 +1,4 @@
-# установка apache2
+# установка apache2 Не забыть проверить группу безовасности (порт 80/8080)
 
 sudo apt update
 sudo apt install apache2 
