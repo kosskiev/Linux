@@ -1,0 +1,57 @@
+# напишу несколько видов playbook 
+# первый просто проверит доступность соединения 
+nano playbook.yml
+--- (обязательное начало файла)
+- name : Test conection to my servers
+  hosts: all  (для всех серверов)
+  become: yes (права root)
+  
+  tasks:
+
+  - name: Ping my servers
+    ping:
+
+# поставим веб сервер
+nano playbook1.yml
+
+---
+- name  : Install apache web server   ( Название для удобства)
+  hosts : all  (для всех серверов) 
+  become: yes  (root права)
+
+  tasks:  (задачи)
+  - name: Install apache web service
+    apt : name=apache2 state=latest  (установить apache, latest - последняя стабильная версия)
+
+
+  - name: Statrt Apache2 and Enable to boot  
+    service: name=apache2 state=started enabled=yes   (название, стартовать, запуск при старте сервиса)
+ 
+# Установка веб сервера, копирование нашего сайта и настройка перезапуска если нужно
+
+---
+- name  : Install apache and upload my website 
+  hosts : all (все серверы, нудную группу можно выбрать)
+  become: yes  (root права)
+
+  vars: (переменные)
+    source_file: ./MyWebSite/index.html  (где лежит наш сайт)
+    destin_file: /var/www/html (куда положить сайт)
+
+  tasks:  (задачи)
+  - name: install Apache Web Server
+    apt : name=apache2 state=latest (установить apache, latest - последняя стабильная версия)
+
+  - name: Cope my home page to servers
+    copy: src={{ source_file }} dest={{ destin_file }} mode=0555  (скопировать)
+    notify: Restart Apache  (если били изменения он пойдет handlers которое мы создали и выполнит перезагрузку)
+
+  - name: Start web service and make it enableon on boot 
+    service: name=apache2 state=started enabled=yes (название, стартовать, запуск при старте сервиса)
+
+
+
+  handlers :
+   - name: Restart Apache  
+     service: name=apache2 state=restarted   (перезагрузка сервера)
+
