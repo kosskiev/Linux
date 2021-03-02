@@ -1,0 +1,91 @@
+# поставлю Ansible на ubuntu 16.04 (AWS) и 4 тестовых сервера с Ubuntu 16.04
+# документация https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible-on-ubuntu
+
+# подключаемся к нашему основному серверу и добавдяем в /home/ubuntu/.ssh наши ключи от остальных серверов
+sudo apt update
+sudo apt install software-properties-common
+sudo apt-add-repository --yes --update ppa:ansible/ansible
+sudo apt install ansible
+ansible --version
+cd /home/ubuntu/.ssh
+sudo nano somekey.pem
+sudo chmod 400 somekey.pem
+
+# Сделаю директорию для нашего Ansible
+mkdir ansible
+cd ansible
+
+# создадим файл с нашими ip адресами к серверам 
+sudo nano hosts.txt
+# название сервера, IP адрес сервера, User имя сервера, расположение файла с ключем по SSH(можно и просто пароль но это не безопастно хранить пароли в открытом виде)
+# пример записи(
+# [staging_servers]
+ubuntu1  ansible_host=172.31.5.125  ansible_user=ubuntu  ansible_ssh_private_key_file=/home/ubuntu/.ssh/Test.pem
+ubuntu2  ansible_host=172.31.5.125  ansible_user=ubuntu  ansible_ssh_private_key_file=/home/ubuntu/.ssh/Test.pem 
+
+[prod_servers]
+ubuntuX  ansible_host=172.31.40.54  ansible_user=ubuntu  ansible_ssh_private_key_file=/home/ubuntu/.ssh/TestX.pem
+ubuntuX2 ansible_host=172.31.7.45   ansible_user=ubuntu  ansible_ssh_private_key_file=/home/ubuntu/.ssh/TestX.pem
+#  )
+
+# проверим подключение  (-i - какой файл инвентори мы используем (в нашем случае тот что мы создали hosts.txt), all - на все серверах я хочу выполнить данную команду(можно выбрать только нужную группу) ,-m - какой модуль используется (ping))
+ansible -i hosts.txt all -m ping
+
+# в ответ мы получаем запрос на подключение(yes/no) чтобы этого не было нужно изменить файл /etc/ansible/ansible.cfg
+# заходим на него и прописываем такую строку (создаем его в той же директории что и hosts.txt)
+host_key_cheking = false - При установке будет игнорироватся запрос на установку (yes/no) 
+inventory        = /home/ubuntu/ansible/hosts.txt  - указываем путь расположения hosts.txt чобы ansible знал где лежит файл
+
+# теперь мы можем запускать ту же команду только укороченную
+ansible all -m ping
+
+# посмотреть к камим серверам/группам какие настройки применены
+ansible-inventory --list
+
+# нарисовать дерево с настройками серверов
+ansible-inventory --graph
+
+# Ad-Hoc команды ansible которые не в файле 
+ansible all -m setup (сканирование сервера и выдача информации по нему)
+
+ansible all -m shell -a "uptime" (с помощью данной команды(ansible all -m shell -a "сюда команду") можна запускать любую команду linux)
+# вместо команды shell можно использовать command но там не работают все команды(такие как $HOME, >, <, |, ;, &) но эта команда считается более безопастней
+
+# скопируем файл с нашего сервера на другие сервера
+echo privet > privet.txt (как пример создали файл)
+ansible all -m copy -a "src=privet.txt dest=/home mode=777" -b (копируем файл с текушей директории с названием privet.txt на другие серверы в директорию /home 
+# и меняем права на файл 777, -b оначает что нужно запустить команду типо как sudo)
+
+# удалим файл на всех серверах
+ansible all -m file -a "path=/home/privet.txt state=absent" -b  (удалит этот файл absent - отсутствует)
+
+# скачать файл на выбранные сервера
+ansible all -m get_url -a "url=(и нужный линк с программой) dest=/home(куда скачать)" -b
+ansible all -m file -a "path=/home/(название файла) state=absent" -b 
+
+# инсталировать файлы на выбранные сервера (name название программы (в примере stress), installed - установить)
+ansible all -m yum -a "name=stress state=installed" -b
+ansible all -m yum -a "name=stress state=removed" -b (удалить программу)
+
+# как прочитать с сайта информацию (проверка доступа с каждого сервера на нужный нам сайт)
+ansible all -m uri -a "http://somesite.com"
+# чтобы посмотреть контент с сайта 
+ansible all -m uri -a "http://somesite.com return_content=yes"
+
+# установим apache сервер
+ansible all -m yum -a "name=apache2 state=installed" -b
+ansible all -m service -a "name=apache2 state=started enabled=yes" -b (enabled=yes - будет запускатся сервер при старте)
+ansible all -m yum -a "name=apache2 state=removed" -b (сотрет сервера)
+
+# чтобы файл hosts.txt не был переполнен информацией мы винесем переменные в другой файл
+# создадим новую директорию (в ansible/) и в ней файл с названием наших групп серверов (если hosts.txt мы назвали группу staging_servers )
+mkdir group_vars/  (название именно такое)
+nano group_vars/staging_servers 
+# пример файла (не забываем если перенесли из файла hosts.txt равно(=) поменять на двоеточие(:))
+---
+ansible_user                 : ubuntu
+ansible_ssh_private_key_file : /home/ubuntu/.ssh/Test.pem
+# после этого можно почистить hosts.txt и оставить там только название групп и IP(или доменные имена)
+
+# поверим нашу структуру вайла hosts.txt
+ansible-inventory --list
