@@ -1,0 +1,99 @@
+# Тестовое задание от Tonti Laguna - Написать сценарий установки на Ansible следующих пакетов:
+# php
+# nginx
+# mysql
+# redis
+# phpmyadmin
+# redisadmin
+# Учесть следующее:
+# Установщик автоматически определяет архитектуру (red-hat, debian) и выполняет нужный сценарий
+# Для каждого пакета можно выбрать версию.  -- не выполнил
+# Для каждого пакета выставлены теги.
+# Для php можно выбрать модули которые необходимо установить.  -- не выполнил
+_______________________________________________________________________________________________
+---
+ - name: Test file for Tonti Laguna
+   hosts: all
+   become: yes
+
+   tasks:
+   - name: Check the Version
+     debug: var=ansible_os_family
+
+   - name: Update apt-get repo and cache
+     apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+
+   - block: #=========================Debian===========================
+        - name: Install nginx
+          apt : name=nginx state=latest
+          tags: nginx
+          notify: Restart nginx
+
+        - name: Install PHP
+          apt : name=php state=latest
+          tags: php
+          
+        - name: Install Mysql
+          apt : name=mysql-server state=latest
+          tags: mysql
+
+        - name: Install redis
+          apt : name=redis-server state=latest
+          tags: redis
+
+        - name: Install phpmydmin
+          apt : name=phpmyadmin state=latest
+          tags: phpmyadmin
+
+        - name: Copy redisadmin
+          git :
+            repo: 'https://github.com/ErikDubbelboer/phpRedisAdmin.git'
+            dest: /home/ubuntu/phpredisadminy
+          tags: redisadmin
+          
+        - name: Copy predis
+          git :
+            repo: 'https://github.com/nrk/predis.git'
+            dest: /home/ubuntu/phpredisadminy/phpRedisAdmin
+          tags: predis
+
+     when: ansible_os_family == "Debian"
+     
+   - block: #=========================RedHat===========================
+        - name: Install nginx
+          yum : name=nginx state=latest
+          tags: nginx
+
+        - name: Install PHP
+          yum : name=php state=latest
+          tags: php
+
+        - name: Install Mysql
+          yum : name=mysql-server state=latest
+          tags: mysql
+
+        - name: Install redis
+          yum : name=redis-server state=latest
+          tags: redis
+
+        - name: Install phpmydmin
+          yum : name=phpmyadmin state=latest
+          tags: phpmyadmin
+
+        - name: Copy redisadmin
+          git :
+            repo: 'https://github.com/ErikDubbelboer/phpRedisAdmin.git'
+            dest: /home/ubuntu/phpredisadminy
+          tags: redisadmin
+
+        - name: Copy predis
+          git :
+            repo: 'https://github.com/nrk/predis.git'
+            dest: /home/ubuntu/phpredisadminy/phpRedisAdmin
+          tags: redis
+
+     when: ansible_os_family == "RedHat"
+
+     handlers:
+   - name: Restart nginx
+     service: name=nginx state=restarted
