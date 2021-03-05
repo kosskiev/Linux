@@ -97,3 +97,52 @@ ________________________________________________________________________________
      handlers:
    - name: Restart nginx
      service: name=nginx state=restarted
+     
+ ____________________________________________________________________________
+ ---
+  - name: Second 
+    hosts: all
+    become: yes
+    
+   tasks:
+   
+   - name: Check the Version
+     debug: var=ansible_os_family
+
+   - name: Update apt-get repo and cache
+     apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+     
+   - block: #=========================Debian===========================
+        - name: Install all services    
+          apt : name= {{ item }} state=instaled
+          with_items: 
+              - nginx
+              - php
+              - mysql
+              - redis
+              - phpadmin
+        
+     when: ansible_os_family == "Debian"
+     
+   - block: #=========================RedHat===========================
+        - name: Install all services    
+          yum : name= {{ item }} state=instaled
+          with_items: 
+              - nginx
+              - php
+              - mysql
+              - redis
+              - phpadmin
+        
+     when: ansible_os_family == "RedHat"
+  
+  notify: 
+    - Restart Web Server
+          
+   handlers:
+    - name: Restart Web Server 
+      service: name=nginx state=restarted
+      
+  _________________________________________________________________________________________
+  
+  
