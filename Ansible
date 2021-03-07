@@ -33,8 +33,8 @@ ansible -i hosts.txt all -m ping
 
 # в ответ мы получаем запрос на подключение(yes/no) чтобы этого не было нужно изменить файл /etc/ansible/ansible.cfg
 # заходим на него и прописываем такую строку (создаем его в той же директории что и hosts.txt)
-host_key_cheking = false - При установке будет игнорироватся запрос на установку (yes/no) 
-inventory        = /home/ubuntu/ansible/hosts.txt  - указываем путь расположения hosts.txt чобы ansible знал где лежит файл
+host_key_cheсking = False - При установке будет игнорироватся запрос на установку (yes/no) 
+inventory         = /home/ubuntu/ansible/hosts.txt  - указываем путь расположения hosts.txt чобы ansible знал где лежит файл
 
 # теперь мы можем запускать ту же команду только укороченную
 ansible all -m ping
