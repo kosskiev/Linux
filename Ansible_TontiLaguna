@@ -20,38 +20,38 @@ ________________________________________________________________________________
    - name: Check the Version
      debug: var=ansible_os_family
 
-   - name: Update apt-get repo and cache
-     apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
-
    - block: #=========================Debian===========================
-        - name: Install nginx
+        - name: Update apt-get repo and cache Debian
+          apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+
+        - name: Install nginx Debian
           apt : name=nginx state=latest
           tags: nginx
           notify: Restart nginx
 
-        - name: Install PHP
+        - name: Install PHP Debian
           apt : name=php state=latest
           tags: php
           
-        - name: Install Mysql
+        - name: Install Mysql Debian
           apt : name=mysql-server state=latest
           tags: mysql
 
-        - name: Install redis
+        - name: Install redis Debian
           apt : name=redis-server state=latest
           tags: redis
 
-        - name: Install phpmydmin
+        - name: Install phpmydmin Debian
           apt : name=phpmyadmin state=latest
           tags: phpmyadmin
 
-        - name: Copy redisadmin
+        - name: Copy redisadmin Debian
           git :
             repo: 'https://github.com/ErikDubbelboer/phpRedisAdmin.git'
             dest: /home/ubuntu/phpredisadminy
           tags: redisadmin
           
-        - name: Copy predis
+        - name: Copy predis Debian
           git :
             repo: 'https://github.com/nrk/predis.git'
             dest: /home/ubuntu/phpredisadminy/phpRedisAdmin
@@ -60,44 +60,61 @@ ________________________________________________________________________________
      when: ansible_os_family == "Debian"
      
    - block: #=========================RedHat===========================
-        - name: Install nginx
+        - name: Update sysytem RedHat
+          yum: name='*' state=latest
+          notify: restart sysytem, wait 10 second, wait for the system to reboot
+
+        - name: Install nginx RedHat
           yum : name=nginx state=latest
           tags: nginx
+          notify: Restart nginx
 
-        - name: Install PHP
+        - name: Install PHP RedHat
           yum : name=php state=latest
           tags: php
 
-        - name: Install Mysql
+        - name: Install Mysql RedHat
           yum : name=mysql-server state=latest
           tags: mysql
 
-        - name: Install redis
-          yum : name=redis-server state=latest
+        - name: Install redis RedHat
+          yum : name=redis state=latest
           tags: redis
 
-        - name: Install phpmydmin
+        - name: Install epel-release for phpmydmin RedHat
+          shell: "yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
+          tags: epel
+
+        - name: Install phpmydmin RedHat
           yum : name=phpmyadmin state=latest
           tags: phpmyadmin
 
-        - name: Copy redisadmin
-          git :
-            repo: 'https://github.com/ErikDubbelboer/phpRedisAdmin.git'
-            dest: /home/ubuntu/phpredisadminy
+        - name: Install redisadmin RedHat
+          yum : name=redis state=latest
           tags: redisadmin
-
-        - name: Copy predis
-          git :
-            repo: 'https://github.com/nrk/predis.git'
-            dest: /home/ubuntu/phpredisadminy/phpRedisAdmin
-          tags: redis
-
+        
      when: ansible_os_family == "RedHat"
 
-     handlers:
+   handlers:
    - name: Restart nginx
      service: name=nginx state=restarted
-     
+
+   - name: restart sysytem
+     shell: "sleep 5 && reboot"
+     async: 1
+     poll: 0
+
+   - name: wait 10 second
+     pause:
+      seconds: 10
+
+   - name: wait for the system to reboot
+     wait_for_connection:
+        connect_timeout: 20
+        sleep: 5
+        delay: 5
+        timeout: 60
+
  ____________________________________________________________________________
  ---
   - name: Second 
