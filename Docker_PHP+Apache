@@ -1,0 +1,40 @@
+# php страничка + apache загружу на hub.docker.com
+
+# пример странички 
+# <?php
+# $ip_server = $_SERVER['SERVER_ADDR'];
+# echo "<h1> Hello from Kubernetes</h1><br>";
+# echo "Server IP Address is: $ip_server", "<br><p>";
+# echo "Made by <font color=blue> Patrakov Kostiantyn";
+# ?>
+
+# docker file 
+nano Docker
+
+FROM amazonlinux
+RUN yum -y update
+RUN yum -y install httpd
+RUN yum -y install php
+COPY ./index.php /var/www/html/index.php
+CMD ["/usr/sbin/httpd","-D","FOREGROUND"]  #(запускаем демон httpd)
+EXPOSE 80
+
+# (Создаем images)
+docker build -t myk8sapp .  
+docker images
+
+# подключаемся к нашему docker hub
+docker login
+
+# переименовать tag (старое myk8app:latest)
+docker tag myk8app:latest kosskyiv/k8sphp:latest
+
+# загружаем на gocker hub
+docker push kosskyiv/k8sphp:latest
+
+# теперь можем удалить ллокально изапустить на сервере он скачает с docker hub
+# удалить images (3c8be1c4b778 - его id)
+docker rmi 3c8be1c4b778 -f
+
+# запускаем нужный нам images если не найдет локально пойдет искать (1234 порт на котором будет работать наш images) НЕЗАБЫТЬ открыть нужный порт
+docker run -it -p 1234:80 kosskyiv/k8sphptest
