@@ -1,0 +1,21 @@
+# поставлю PostgreSQL на докер
+docker run --name PostgreSQL -e POSTGRES_PASSWORD=password1 -d postgres
+
+docker ps
+# вход в контейнер
+docker exec -it PostgreSQL psql -U postgres
+___________________________________________
+# создать в ручную базу, таблицу и значение
+CREATE DATABASE demo_db1;
+CREATE TABLE demo_t(something int);
+INSERT INTO demo_t(something) values (1);
+
+\dt
+select * from demo_t;
+\q
+# удаляем PostgreSQL
+docker rm -f PostgreSQL 
+____________________________________________
+# автоматически 
+
+docker run --name demo -v "$PWD"/:/root -e POSTGRES_PASSWORD=password1 -d postgres
