@@ -1,0 +1,33 @@
+# docker network create network --subnet 172.20.0.0/16
+# docker-compose up -d
+version: '3.8'
+
+services:
+
+  postgresql:
+    container_name: postgresql
+    image: bitnami/postgresql:11.11.0
+    networks:
+      - bridge
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+        reservations:
+          memory: 512M
+    restart: always
+    environment:
+      - POSTGRESQL_PASSWORD=Passw0rd123
+    ports:
+      - 5432:5432
+    volumes:
+      - ./dump-restore:/scripts
+      - ./data-postgresql:/bitnami/postgresql
+
+volumes:
+  data-postgresql:
+    driver: local
+networks:
+  bridge:
+    name: network
+
